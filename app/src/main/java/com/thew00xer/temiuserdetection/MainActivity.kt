@@ -1,13 +1,14 @@
 package com.thew00xer.temiuserdetection
 
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import com.robotemi.sdk.Robot
 import com.robotemi.sdk.Robot.Companion.getInstance
 import com.robotemi.sdk.listeners.OnDetectionDataChangedListener
@@ -15,13 +16,13 @@ import com.robotemi.sdk.listeners.OnDetectionStateChangedListener
 import com.robotemi.sdk.listeners.OnRobotReadyListener
 import com.robotemi.sdk.model.DetectionData
 
-@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataChangedListener, OnDetectionStateChangedListener {
 
     private lateinit var robot: Robot
     private lateinit var infoText: TextView
-    private lateinit var startButton: Button
+    private lateinit var startButton: ImageButton
     private lateinit var stopButton: Button
+
     private lateinit var detectionStatus: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataC
 
         robot = getInstance()
 
-        startButton = findViewById(R.id.button1)
+        startButton = findViewById(R.id.enterButton)
         stopButton = findViewById(R.id.button2)
         infoText = findViewById(R.id.textView)
 
@@ -41,7 +42,8 @@ class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataC
         startButton.setOnClickListener {
             robot.addOnDetectionStateChangedListener(this)
             robot.addOnDetectionDataChangedListener(this)
-            startButton.setBackgroundColor(Color.GRAY)
+            robot.setDetectionModeOn(true, 0F)
+            startButton.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.enter_key_black))
             startButton.isClickable = false
 
             // Handler to stop detection if there are no users detected from the beginning.
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataC
                     Toast.makeText(this@MainActivity, "I was waiting.", Toast.LENGTH_SHORT).show()
                     robot.removeOnDetectionStateChangedListener(this)
                     robot.removeOnDetectionDataChangedListener(this)
-                    startButton.setBackgroundColor(Color.parseColor("#6496FF"))
+                    startButton.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.enter_key_green))
                     startButton.isClickable = true
                     infoText.text = ""
                 }
@@ -60,7 +62,8 @@ class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataC
         stopButton.setOnClickListener {
             robot.removeOnDetectionStateChangedListener(this)
             robot.removeOnDetectionDataChangedListener(this)
-            startButton.setBackgroundColor(Color.parseColor("#6496FF"))
+            robot.setDetectionModeOn(false, 0F)
+            startButton.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.enter_key_green))
             startButton.isClickable = true
             infoText.text = ""
         }
@@ -121,7 +124,7 @@ class MainActivity : AppCompatActivity(), OnRobotReadyListener, OnDetectionDataC
             infoText.text = ""
         }
         if (detectionStatus == "Detect State -> Idle") {
-            startButton.setBackgroundColor(Color.parseColor("#6496FF"))
+            startButton.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.enter_key_green))
             startButton.isClickable = true
             infoText.text = ""
         }
